@@ -66,11 +66,6 @@ type WorkerGlobalScopeEventMap = {
   unhandledrejection: PromiseRejectionEvent;
   rejectionhandled: PromiseRejectionEvent;
 };
-/**
- * This Web Workers API interface is an interface representing the scope of any worker. Workers have no browsing context; this scope contains the information usually conveyed by Window objects — in this case event handlers, the console or the associated WorkerNavigator object. Each WorkerGlobalScope has its own event loop.
- *
- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope)
- */
 declare abstract class WorkerGlobalScope extends EventTarget<WorkerGlobalScopeEventMap> {
   EventTarget: typeof EventTarget;
 }
@@ -367,30 +362,31 @@ declare function fetch(
   input: RequestInfo,
   init?: RequestInit<RequestInitCfProperties>,
 ): Promise<Response>;
-/**
- * Returns workerGlobal.
- *
- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/self)
- */
 declare const self: ServiceWorkerGlobalScope;
-/* [MDN Reference](https://developer.mozilla.org/docs/Web/API/crypto_property) */
+/**
+ * The Web Crypto API provides a set of low-level functions for common cryptographic tasks.
+ * The Workers runtime implements the full surface of this API, but with some differences in
+ * the [supported algorithms](https://developers.cloudflare.com/workers/runtime-apis/web-crypto/#supported-algorithms)
+ * compared to those implemented in most browsers.
+ *
+ * [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/web-crypto/)
+ */
 declare const crypto: Crypto;
 /**
- * Available only in secure contexts.
+ * The Cache API allows fine grained control of reading and writing from the Cloudflare global network cache.
  *
- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/caches)
+ * [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/cache/)
  */
 declare const caches: CacheStorage;
 declare const scheduler: Scheduler;
-/* [MDN Reference](https://developer.mozilla.org/docs/Web/API/performance_property) */
-declare const performance: Performance;
-/* [MDN Reference](https://developer.mozilla.org/docs/Web/API/origin) */
-declare const origin: string;
 /**
- * Returns workerGlobal's WorkerNavigator object.
+ * The Workers runtime supports a subset of the Performance API, used to measure timing and performance,
+ * as well as timing of subrequests and other operations.
  *
- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/navigator)
+ * [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/performance/)
  */
+declare const performance: Performance;
+declare const origin: string;
 declare const navigator: Navigator;
 interface TestController {}
 interface ExecutionContext {
@@ -465,14 +461,15 @@ declare abstract class Navigator {
   readonly gpu: GPU;
 }
 /**
- * Provides access to performance-related information for the current page. It's part of the High Resolution Time API, but is enhanced by the Performance Timeline API, the Navigation Timing API, the User Timing API, and the Resource Timing API.
+ * The Workers runtime supports a subset of the Performance API, used to measure timing and performance,
+ * as well as timing of subrequests and other operations.
  *
- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Performance)
+ * [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/performance/)
  */
 interface Performance {
-  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Performance/timeOrigin) */
+  /* [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/performance/#performancetimeorigin) */
   readonly timeOrigin: number;
-  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Performance/now) */
+  /* [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/performance/#performancenow) */
   now(): number;
 }
 interface AlarmInvocationInfo {
@@ -975,10 +972,9 @@ interface FileOptions {
   lastModified?: number;
 }
 /**
- * The storage for Cache objects.
- * Available only in secure contexts.
+ * The Cache API allows fine grained control of reading and writing from the Cloudflare global network cache.
  *
- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CacheStorage)
+ * [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/cache/)
  */
 declare abstract class CacheStorage {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/CacheStorage/open) */
@@ -986,29 +982,31 @@ declare abstract class CacheStorage {
   readonly default: Cache;
 }
 /**
- * Provides a storage mechanism for Request / Response object pairs that are cached, for example as part of the ServiceWorker life cycle. Note that the Cache interface is exposed to windowed scopes as well as workers. You don't have to use it in conjunction with service workers, even though it is defined in the service worker spec.
- * Available only in secure contexts.
+ * The Cache API allows fine grained control of reading and writing from the Cloudflare global network cache.
  *
- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Cache)
+ * [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/cache/)
  */
 declare abstract class Cache {
-  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Cache/delete) */
+  /* [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/cache/#delete) */
   delete(request: RequestInfo, options?: CacheQueryOptions): Promise<boolean>;
-  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Cache/match) */
+  /* [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/cache/#match) */
   match(
     request: RequestInfo,
     options?: CacheQueryOptions,
   ): Promise<Response | undefined>;
-  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Cache/put) */
+  /* [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/cache/#put) */
   put(request: RequestInfo, response: Response): Promise<void>;
 }
 interface CacheQueryOptions {
   ignoreMethod?: boolean;
 }
 /**
- * Basic cryptography features available in the current context. It allows access to a cryptographically strong random number generator and to cryptographic primitives.
+ * The Web Crypto API provides a set of low-level functions for common cryptographic tasks.
+ * The Workers runtime implements the full surface of this API, but with some differences in
+ * the [supported algorithms](https://developers.cloudflare.com/workers/runtime-apis/web-crypto/#supported-algorithms)
+ * compared to those implemented in most browsers.
  *
- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Crypto)
+ * [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/web-crypto/)
  */
 declare abstract class Crypto {
   /**

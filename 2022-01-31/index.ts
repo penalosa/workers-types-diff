@@ -205,6 +205,7 @@ export declare namespace WebAssembly {
 }
 /**
  * This ServiceWorker API interface represents the global execution context of a service worker.
+ * Available only in secure contexts.
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerGlobalScope)
  */
@@ -861,6 +862,7 @@ export declare abstract class AbortSignal extends EventTarget {
   static abort(reason?: any): AbortSignal;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/timeout_static) */
   static timeout(delay: number): AbortSignal;
+  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/any_static) */
   static any(signals: AbortSignal[]): AbortSignal;
   /**
    * Returns true if this AbortSignal's AbortController has signaled to abort, and false otherwise.
@@ -1073,7 +1075,7 @@ export declare abstract class SubtleCrypto {
   deriveBits(
     algorithm: string | SubtleCryptoDeriveKeyAlgorithm,
     baseKey: CryptoKey,
-    length: number | null,
+    length?: number | null,
   ): Promise<ArrayBuffer>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey) */
   importKey(

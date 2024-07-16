@@ -261,9 +261,6 @@ interface ServiceWorkerGlobalScope extends WorkerGlobalScope {
   ReadableByteStreamController: typeof ReadableByteStreamController;
   WritableStreamDefaultController: typeof WritableStreamDefaultController;
   TransformStreamDefaultController: typeof TransformStreamDefaultController;
-  Buffer: any;
-  process: any;
-  global: ServiceWorkerGlobalScope;
   CompressionStream: typeof CompressionStream;
   DecompressionStream: typeof DecompressionStream;
   TextEncoderStream: typeof TextEncoderStream;
@@ -395,9 +392,6 @@ declare const scheduler: Scheduler;
  */
 declare const performance: Performance;
 declare const origin: string;
-declare const Buffer: any;
-declare const process: any;
-declare const global: ServiceWorkerGlobalScope;
 declare const navigator: Navigator;
 interface TestController {}
 interface ExecutionContext {

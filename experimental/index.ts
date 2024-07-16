@@ -256,6 +256,11 @@ export interface ServiceWorkerGlobalScope extends WorkerGlobalScope {
   CountQueuingStrategy: typeof CountQueuingStrategy;
   ErrorEvent: typeof ErrorEvent;
   EventSource: typeof EventSource;
+  ReadableStreamBYOBRequest: typeof ReadableStreamBYOBRequest;
+  ReadableStreamDefaultController: typeof ReadableStreamDefaultController;
+  ReadableByteStreamController: typeof ReadableByteStreamController;
+  WritableStreamDefaultController: typeof WritableStreamDefaultController;
+  TransformStreamDefaultController: typeof TransformStreamDefaultController;
   CompressionStream: typeof CompressionStream;
   DecompressionStream: typeof DecompressionStream;
   TextEncoderStream: typeof TextEncoderStream;
@@ -271,6 +276,8 @@ export interface ServiceWorkerGlobalScope extends WorkerGlobalScope {
   AbortSignal: typeof AbortSignal;
   TextDecoder: typeof TextDecoder;
   TextEncoder: typeof TextEncoder;
+  navigator: Navigator;
+  Navigator: typeof Navigator;
   URL: typeof URL;
   URLSearchParams: typeof URLSearchParams;
   URLPattern: typeof URLPattern;
@@ -387,10 +394,12 @@ export declare const scheduler: Scheduler;
  */
 export declare const performance: Performance;
 export declare const origin: string;
+export declare const navigator: Navigator;
 export interface TestController {}
 export interface ExecutionContext {
   waitUntil(promise: Promise<any>): void;
   passThroughOnException(): void;
+  abort(reason?: any): void;
 }
 export type ExportedHandlerFetchHandler<
   Env = unknown,
@@ -447,6 +456,20 @@ export declare abstract class PromiseRejectionEvent extends Event {
   readonly promise: Promise<any>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/PromiseRejectionEvent/reason) */
   readonly reason: any;
+}
+export declare abstract class Navigator {
+  sendBeacon(
+    url: string,
+    body?:
+      | ReadableStream
+      | string
+      | (ArrayBuffer | ArrayBufferView)
+      | Blob
+      | URLSearchParams
+      | FormData,
+  ): boolean;
+  readonly userAgent: string;
+  readonly gpu: GPU;
 }
 /**
  * The Workers runtime supports a subset of the Performance API, used to measure timing and performance,
@@ -505,6 +528,10 @@ export interface DurableObjectNamespace<
     id: DurableObjectId,
     options?: DurableObjectNamespaceGetDurableObjectOptions,
   ): DurableObjectStub<T>;
+  getExisting(
+    id: DurableObjectId,
+    options?: DurableObjectNamespaceGetDurableObjectOptions,
+  ): DurableObjectStub<T>;
   jurisdiction(
     jurisdiction: DurableObjectJurisdiction,
   ): DurableObjectNamespace<T>;
@@ -539,6 +566,7 @@ export interface DurableObjectState {
   setHibernatableWebSocketEventTimeout(timeoutMs?: number): void;
   getHibernatableWebSocketEventTimeout(): number | null;
   getTags(ws: WebSocket): string[];
+  abort(reason?: string): void;
 }
 export interface DurableObjectTransaction {
   get<T = unknown>(
@@ -605,7 +633,11 @@ export interface DurableObjectStorage {
   ): Promise<void>;
   deleteAlarm(options?: DurableObjectSetAlarmOptions): Promise<void>;
   sync(): Promise<void>;
+  sql: SqlStorage;
   transactionSync<T>(closure: () => T): T;
+  getCurrentBookmark(): Promise<string>;
+  getBookmarkForTime(timestamp: number | Date): Promise<string>;
+  onNextSessionRestoreBookmark(bookmark: string): Promise<string>;
 }
 export interface DurableObjectListOptions {
   start?: string;
@@ -658,73 +690,79 @@ export declare class Event {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/type)
    */
-  readonly type: string;
+  get type(): string;
   /**
    * Returns the event's phase, which is one of NONE, CAPTURING_PHASE, AT_TARGET, and BUBBLING_PHASE.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/eventPhase)
    */
-  readonly eventPhase: number;
+  get eventPhase(): number;
   /**
    * Returns true or false depending on how event was initialized. True if event invokes listeners past a ShadowRoot node that is the root of its target, and false otherwise.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/composed)
    */
-  readonly composed: boolean;
+  get composed(): boolean;
   /**
    * Returns true or false depending on how event was initialized. True if event goes through its target's ancestors in reverse tree order, and false otherwise.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/bubbles)
    */
-  readonly bubbles: boolean;
+  get bubbles(): boolean;
   /**
    * Returns true or false depending on how event was initialized. Its return value does not always carry meaning, but true can indicate that part of the operation during which event was dispatched, can be canceled by invoking the preventDefault() method.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/cancelable)
    */
-  readonly cancelable: boolean;
+  get cancelable(): boolean;
   /**
    * Returns true if preventDefault() was invoked successfully to indicate cancelation, and false otherwise.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/defaultPrevented)
    */
-  readonly defaultPrevented: boolean;
+  get defaultPrevented(): boolean;
   /**
    * @deprecated
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/returnValue)
    */
-  readonly returnValue: boolean;
+  get returnValue(): boolean;
   /**
    * Returns the object whose event listener's callback is currently being invoked.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/currentTarget)
    */
-  readonly currentTarget?: EventTarget;
+  get currentTarget(): EventTarget | undefined;
   /**
    * @deprecated
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/srcElement)
    */
-  readonly srcElement?: EventTarget;
+  get srcElement(): EventTarget | undefined;
   /**
    * Returns the event's timestamp as the number of milliseconds measured relative to the time origin.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/timeStamp)
    */
-  readonly timeStamp: number;
+  get timeStamp(): number;
   /**
    * Returns true if event was dispatched by the user agent, and false otherwise.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/isTrusted)
    */
-  readonly isTrusted: boolean;
+  get isTrusted(): boolean;
   /**
    * @deprecated
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/cancelBubble)
    */
-  cancelBubble: boolean;
+  get cancelBubble(): boolean;
+  /**
+   * @deprecated
+   *
+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/cancelBubble)
+   */
+  set cancelBubble(value: boolean);
   /**
    * Invoking this method prevents event from reaching any registered event listeners after the current one finishes running and, when dispatched in a tree, also prevents event from reaching any other objects.
    *
@@ -840,7 +878,7 @@ export declare class AbortController {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortController/signal)
    */
-  readonly signal: AbortSignal;
+  get signal(): AbortSignal;
   /**
    * Invoking this method will set this object's AbortSignal's aborted flag and signal to any observers that the associated activity is to be aborted.
    *
@@ -865,9 +903,9 @@ export declare abstract class AbortSignal extends EventTarget {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/aborted)
    */
-  readonly aborted: boolean;
+  get aborted(): boolean;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/reason) */
-  readonly reason: any;
+  get reason(): any;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/abort_event) */
   get onabort(): any | null;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/abort_event) */
@@ -917,9 +955,9 @@ export declare class Blob {
     options?: BlobOptions,
   );
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/size) */
-  readonly size: number;
+  get size(): number;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/type) */
-  readonly type: string;
+  get type(): string;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/slice) */
   slice(start?: number, end?: number, type?: string): Blob;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/arrayBuffer) */
@@ -945,9 +983,9 @@ export declare class File extends Blob {
     options?: FileOptions,
   );
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/File/name) */
-  readonly name: string;
+  get name(): string;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/File/lastModified) */
-  readonly lastModified: number;
+  get lastModified(): number;
 }
 export interface FileOptions {
   type?: string;
@@ -996,7 +1034,7 @@ export declare abstract class Crypto {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Crypto/subtle)
    */
-  readonly subtle: SubtleCrypto;
+  get subtle(): SubtleCrypto;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Crypto/getRandomValues) */
   getRandomValues<
     T extends
@@ -1230,7 +1268,7 @@ export declare class DigestStream extends WritableStream<
   ArrayBuffer | ArrayBufferView
 > {
   constructor(algorithm: string | SubtleCryptoHashAlgorithm);
-  readonly digest: Promise<ArrayBuffer>;
+  get digest(): Promise<ArrayBuffer>;
   get bytesWritten(): number | bigint;
 }
 /**
@@ -1259,9 +1297,9 @@ export declare class TextDecoder {
     input?: ArrayBuffer | ArrayBufferView,
     options?: TextDecoderDecodeOptions,
   ): string;
-  readonly encoding: string;
-  readonly fatal: boolean;
-  readonly ignoreBOM: boolean;
+  get encoding(): string;
+  get fatal(): boolean;
+  get ignoreBOM(): boolean;
 }
 /**
  * TextEncoder takes a stream of code points as input and emits a stream of bytes. For a more scalable, non-native library, see StringView – a C-like representation of strings based on typed arrays.
@@ -1285,7 +1323,7 @@ export declare class TextEncoder {
     input: string,
     buffer: ArrayBuffer | ArrayBufferView,
   ): TextEncoderEncodeIntoResult;
-  readonly encoding: string;
+  get encoding(): string;
 }
 export interface TextDecoderConstructorOptions {
   fatal: boolean;
@@ -1337,9 +1375,9 @@ export declare class FormData {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/delete) */
   delete(name: string): void;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/get) */
-  get(name: string): string | null;
+  get(name: string): (File | string) | null;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/getAll) */
-  getAll(name: string): string[];
+  getAll(name: string): (File | string)[];
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/has) */
   has(name: string): boolean;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/set) */
@@ -1347,7 +1385,7 @@ export declare class FormData {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/set) */
   set(name: string, value: Blob, filename?: string): void;
   /* Returns an array of key, value pairs for every entry in the list. */
-  entries(): IterableIterator<[key: string, value: string]>;
+  entries(): IterableIterator<[key: string, value: File | string]>;
   /* Returns a list of keys in the list. */
   keys(): IterableIterator<string>;
   /* Returns a list of values in the list. */
@@ -1355,13 +1393,13 @@ export declare class FormData {
   forEach<This = unknown>(
     callback: (
       this: This,
-      value: string,
+      value: File | string,
       key: string,
       parent: FormData,
     ) => void,
     thisArg?: This,
   ): void;
-  [Symbol.iterator](): IterableIterator<[key: string, value: string]>;
+  [Symbol.iterator](): IterableIterator<[key: string, value: File | string]>;
 }
 export interface ContentOptions {
   html?: boolean;
@@ -1462,6 +1500,8 @@ export declare class Headers {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/get) */
   get(name: string): string | null;
   getAll(name: string): string[];
+  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/getSetCookie) */
+  getSetCookie(): string[];
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/has) */
   has(name: string): boolean;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/set) */
@@ -1492,9 +1532,9 @@ export type BodyInit =
   | FormData;
 export declare abstract class Body {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/body) */
-  readonly body: ReadableStream | null;
+  get body(): ReadableStream | null;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/bodyUsed) */
-  readonly bodyUsed: boolean;
+  get bodyUsed(): boolean;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/arrayBuffer) */
   arrayBuffer(): Promise<ArrayBuffer>;
   bytes(): Promise<Uint8Array>;
@@ -1521,19 +1561,19 @@ export declare class Response extends Body {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/clone) */
   clone(): Response;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/status) */
-  readonly status: number;
+  get status(): number;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/statusText) */
-  readonly statusText: string;
+  get statusText(): string;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/headers) */
-  readonly headers: Headers;
+  get headers(): Headers;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/ok) */
-  readonly ok: boolean;
+  get ok(): boolean;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/redirected) */
-  readonly redirected: boolean;
+  get redirected(): boolean;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/url) */
-  readonly url: string;
-  readonly webSocket: WebSocket | null;
-  readonly cf?: any;
+  get url(): string;
+  get webSocket(): WebSocket | null;
+  get cf(): any | undefined;
 }
 export interface ResponseInit {
   status?: number;
@@ -1564,45 +1604,45 @@ export declare class Request<
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/method)
    */
-  readonly method: string;
+  get method(): string;
   /**
    * Returns the URL of request as a string.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/url)
    */
-  readonly url: string;
+  get url(): string;
   /**
    * Returns a Headers object consisting of the headers associated with request. Note that headers added in the network layer by the user agent will not be accounted for in this object, e.g., the "Host" header.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/headers)
    */
-  readonly headers: Headers;
+  get headers(): Headers;
   /**
    * Returns the redirect mode associated with request, which is a string indicating how redirects for the request will be handled during fetching. A request will follow redirects by default.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/redirect)
    */
-  readonly redirect: string;
-  readonly fetcher: Fetcher | null;
+  get redirect(): string;
+  get fetcher(): Fetcher | null;
   /**
    * Returns the signal associated with request, which is an AbortSignal object indicating whether or not request has been aborted, and its abort event handler.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/signal)
    */
-  readonly signal: AbortSignal;
-  readonly cf?: Cf;
+  get signal(): AbortSignal;
+  get cf(): Cf | undefined;
   /**
    * Returns request's subresource integrity metadata, which is a cryptographic hash of the resource being fetched. Its value consists of multiple hashes separated by whitespace. [SRI]
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/integrity)
    */
-  readonly integrity: string;
+  get integrity(): string;
   /**
    * Returns a boolean indicating whether or not request can outlive the global in which it was created.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/keepalive)
    */
-  readonly keepalive: boolean;
+  get keepalive(): boolean;
 }
 export interface RequestInit<Cf = CfProperties> {
   /* A string to set request's method. */
@@ -1627,15 +1667,43 @@ export type Fetcher<
   T extends Rpc.EntrypointBranded | undefined = undefined,
   Reserved extends string = never,
 > = (T extends Rpc.EntrypointBranded
-  ? Rpc.Provider<T, Reserved | "fetch" | "connect">
+  ? Rpc.Provider<T, Reserved | "fetch" | "connect" | "queue" | "scheduled">
   : unknown) & {
   fetch(input: RequestInfo, init?: RequestInit): Promise<Response>;
   connect(address: SocketAddress | string, options?: SocketOptions): Socket;
+  queue(
+    queueName: string,
+    messages: ServiceBindingQueueMessage[],
+  ): Promise<FetcherQueueResult>;
+  scheduled(options?: FetcherScheduledOptions): Promise<FetcherScheduledResult>;
 };
-export interface FetcherPutOptions {
-  expiration?: number;
-  expirationTtl?: number;
+export interface FetcherScheduledOptions {
+  scheduledTime?: Date;
+  cron?: string;
 }
+export interface FetcherScheduledResult {
+  outcome: string;
+  noRetry: boolean;
+}
+export interface FetcherQueueResult {
+  outcome: string;
+  ackAll: boolean;
+  retryBatch: QueueRetryBatch;
+  explicitAcks: string[];
+  retryMessages: QueueRetryMessage[];
+}
+export type ServiceBindingQueueMessage<Body = unknown> = {
+  id: string;
+  timestamp: Date;
+  attempts: number;
+} & (
+  | {
+      body: Body;
+    }
+  | {
+      serializedBody: ArrayBuffer | ArrayBufferView;
+    }
+);
 export interface KVNamespaceListKey<Metadata, Key extends string = string> {
   name: Key;
   expiration?: number;
@@ -1766,6 +1834,14 @@ export interface MessageSendRequest<Body = unknown> {
   contentType?: QueueContentType;
   delaySeconds?: number;
 }
+export interface QueueRetryBatch {
+  retry: boolean;
+  delaySeconds?: number;
+}
+export interface QueueRetryMessage {
+  msgId: string;
+  delaySeconds?: number;
+}
 export interface QueueRetryOptions {
   delaySeconds?: number;
 }
@@ -1802,6 +1878,7 @@ export interface R2ListOptions {
   cursor?: string;
   delimiter?: string;
   startAfter?: string;
+  include?: ("httpMetadata" | "customMetadata")[];
 }
 export declare abstract class R2Bucket {
   head(key: string): Promise<R2Object | null>;
@@ -1954,6 +2031,11 @@ export type R2Objects = {
       truncated: false;
     }
 );
+export declare abstract class JsRpcProperty {
+  then(handler: Function, errorHandler?: Function): any;
+  catch(errorHandler: Function): any;
+  finally(onFinally: Function): any;
+}
 export declare abstract class ScheduledEvent extends ExtendableEvent {
   readonly scheduledTime: number;
   readonly cron: string;
@@ -2051,7 +2133,7 @@ export type ReadableStreamReadResult<R = any> =
  */
 export interface ReadableStream<R = any> {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/locked) */
-  readonly locked: boolean;
+  get locked(): boolean;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/cancel) */
   cancel(reason?: any): Promise<void>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/getReader) */
@@ -2094,7 +2176,7 @@ export declare const ReadableStream: {
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultReader) */
 export declare class ReadableStreamDefaultReader<R = any> {
   constructor(stream: ReadableStream);
-  readonly closed: Promise<void>;
+  get closed(): Promise<void>;
   cancel(reason?: any): Promise<void>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultReader/read) */
   read(): Promise<ReadableStreamReadResult<R>>;
@@ -2104,7 +2186,7 @@ export declare class ReadableStreamDefaultReader<R = any> {
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader) */
 export declare class ReadableStreamBYOBReader {
   constructor(stream: ReadableStream);
-  readonly closed: Promise<void>;
+  get closed(): Promise<void>;
   cancel(reason?: any): Promise<void>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader/read) */
   read<T extends ArrayBufferView>(
@@ -2129,7 +2211,7 @@ export interface ReadableStreamGetReaderOptions {
   mode: "byob";
 }
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest) */
-export interface ReadableStreamBYOBRequest {
+export declare abstract class ReadableStreamBYOBRequest {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest/view) */
   get view(): Uint8Array | null;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest/respond) */
@@ -2139,7 +2221,7 @@ export interface ReadableStreamBYOBRequest {
   get atLeast(): number | null;
 }
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController) */
-export interface ReadableStreamDefaultController<R = any> {
+export declare abstract class ReadableStreamDefaultController<R = any> {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/desiredSize) */
   get desiredSize(): number | null;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/close) */
@@ -2150,7 +2232,7 @@ export interface ReadableStreamDefaultController<R = any> {
   error(reason: any): void;
 }
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController) */
-export interface ReadableByteStreamController {
+export declare abstract class ReadableByteStreamController {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/byobRequest) */
   get byobRequest(): ReadableStreamBYOBRequest | null;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/desiredSize) */
@@ -2167,14 +2249,14 @@ export interface ReadableByteStreamController {
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultController)
  */
-export interface WritableStreamDefaultController {
+export declare abstract class WritableStreamDefaultController {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultController/signal) */
   get signal(): AbortSignal;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultController/error) */
   error(reason?: any): void;
 }
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController) */
-export interface TransformStreamDefaultController<O = any> {
+export declare abstract class TransformStreamDefaultController<O = any> {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/desiredSize) */
   get desiredSize(): number | null;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/enqueue) */
@@ -2204,7 +2286,7 @@ export declare class WritableStream<W = any> {
     queuingStrategy?: QueuingStrategy,
   );
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/locked) */
-  readonly locked: boolean;
+  get locked(): boolean;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/abort) */
   abort(reason?: any): Promise<void>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/close) */
@@ -2220,11 +2302,11 @@ export declare class WritableStream<W = any> {
 export declare class WritableStreamDefaultWriter<W = any> {
   constructor(stream: WritableStream);
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/closed) */
-  readonly closed: Promise<void>;
+  get closed(): Promise<void>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/ready) */
-  readonly ready: Promise<void>;
+  get ready(): Promise<void>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/desiredSize) */
-  readonly desiredSize: number | null;
+  get desiredSize(): number | null;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/abort) */
   abort(reason?: any): Promise<void>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/close) */
@@ -2242,9 +2324,9 @@ export declare class TransformStream<I = any, O = any> {
     readableStrategy?: QueuingStrategy<O>,
   );
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStream/readable) */
-  readonly readable: ReadableStream<O>;
+  get readable(): ReadableStream<O>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStream/writable) */
-  readonly writable: WritableStream<I>;
+  get writable(): WritableStream<I>;
 }
 export declare class FixedLengthStream extends IdentityTransformStream {
   constructor(
@@ -2455,43 +2537,62 @@ export interface UnsafeTraceMetrics {
  */
 export declare class URL {
   constructor(url: string | URL, base?: string | URL);
-  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/href) */
-  href: string;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/origin) */
-  readonly origin: string;
+  get origin(): string;
+  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/href) */
+  get href(): string;
+  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/href) */
+  set href(value: string);
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/protocol) */
-  protocol: string;
+  get protocol(): string;
+  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/protocol) */
+  set protocol(value: string);
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/username) */
-  username: string;
+  get username(): string;
+  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/username) */
+  set username(value: string);
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/password) */
-  password: string;
+  get password(): string;
+  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/password) */
+  set password(value: string);
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/host) */
-  host: string;
+  get host(): string;
+  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/host) */
+  set host(value: string);
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/hostname) */
-  hostname: string;
+  get hostname(): string;
+  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/hostname) */
+  set hostname(value: string);
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/port) */
-  port: string;
+  get port(): string;
+  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/port) */
+  set port(value: string);
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/pathname) */
-  pathname: string;
+  get pathname(): string;
+  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/pathname) */
+  set pathname(value: string);
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/search) */
-  search: string;
-  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/searchParams) */
-  readonly searchParams: URLSearchParams;
+  get search(): string;
+  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/search) */
+  set search(value: string);
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/hash) */
-  hash: string;
-  /*function toString() { [native code] }*/
-  toString(): string;
+  get hash(): string;
+  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/hash) */
+  set hash(value: string);
+  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/searchParams) */
+  get searchParams(): URLSearchParams;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/toJSON) */
   toJSON(): string;
+  /*function toString() { [native code] }*/
+  toString(): string;
+  /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/canParse_static) */
+  static canParse(url: string, base?: string): boolean;
+  static parse(url: string, base?: string): URL | null;
 }
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams) */
 export declare class URLSearchParams {
   constructor(
-    init?:
-      | URLSearchParams
-      | string
-      | Record<string, string>
-      | [key: string, value: string][],
+    init?: Iterable<Iterable<string>> | Record<string, string> | string,
   );
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/size) */
   get size(): number;
@@ -2506,7 +2607,7 @@ export declare class URLSearchParams {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/delete)
    */
-  delete(name: string): void;
+  delete(name: string, value?: string): void;
   /**
    * Returns the first value associated to the given search parameter.
    *
@@ -2524,7 +2625,7 @@ export declare class URLSearchParams {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/has)
    */
-  has(name: string): boolean;
+  has(name: string, value?: string): boolean;
   /**
    * Sets the value associated to a given search parameter to the given value. If there were several values, delete the others.
    *
@@ -2690,25 +2791,25 @@ export declare class WebSocket extends EventTarget<WebSocketEventMap> {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/readyState)
    */
-  readonly readyState: number;
+  get readyState(): number;
   /**
    * Returns the URL that was used to establish the WebSocket connection.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/url)
    */
-  readonly url: string | null;
+  get url(): string | null;
   /**
    * Returns the subprotocol selected by the server, if any. It can be used in conjunction with the array form of the constructor's second argument to perform subprotocol negotiation.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/protocol)
    */
-  readonly protocol: string | null;
+  get protocol(): string | null;
   /**
    * Returns the extensions selected by the server, if any.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/extensions)
    */
-  readonly extensions: string | null;
+  get extensions(): string | null;
 }
 export declare const WebSocketPair: {
   new (): {
@@ -2716,6 +2817,30 @@ export declare const WebSocketPair: {
     1: WebSocket;
   };
 };
+export interface SqlStorage {
+  exec(query: string, ...bindings: any[]): SqlStorageCursor;
+  prepare(query: string): SqlStorageStatement;
+  ingest(query: string): SqlStorageIngestResult;
+  get databaseSize(): number;
+  Cursor: typeof SqlStorageCursor;
+  Statement: typeof SqlStorageStatement;
+}
+export declare abstract class SqlStorageStatement {}
+export declare abstract class SqlStorageCursor {
+  raw(): IterableIterator<((ArrayBuffer | string | number) | null)[]>;
+  get columnNames(): string[];
+  get rowsRead(): number;
+  get rowsWritten(): number;
+  [Symbol.iterator](): IterableIterator<
+    Record<string, (ArrayBuffer | string | number) | null>
+  >;
+}
+export interface SqlStorageIngestResult {
+  remainder: string;
+  rowsRead: number;
+  rowsWritten: number;
+  statementCount: number;
+}
 export interface Socket {
   get readable(): ReadableStream;
   get writable(): WritableStream;
@@ -2739,6 +2864,9 @@ export interface TlsOptions {
 export interface SocketInfo {
   remoteAddress?: string;
   localAddress?: string;
+}
+export interface GPU {
+  requestAdapter(param1?: GPURequestAdapterOptions): Promise<GPUAdapter | null>;
 }
 export declare abstract class GPUAdapter {
   requestDevice(param1?: GPUDeviceDescriptor): Promise<GPUDevice>;
@@ -2988,6 +3116,10 @@ export interface GPUQueue {
 export declare abstract class GPUMapMode {
   static readonly READ: number;
   static readonly WRITE: number;
+}
+export interface GPURequestAdapterOptions {
+  powerPreference: string;
+  forceFallbackAdapter?: boolean;
 }
 export interface GPUAdapterInfo {
   get vendor(): string;

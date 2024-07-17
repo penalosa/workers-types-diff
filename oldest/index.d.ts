@@ -559,12 +559,12 @@ interface DurableObjectTransaction {
   delete(key: string, options?: DurableObjectPutOptions): Promise<boolean>;
   delete(keys: string[], options?: DurableObjectPutOptions): Promise<number>;
   rollback(): void;
-  getAlarm(param1?: DurableObjectGetAlarmOptions): Promise<number | null>;
+  getAlarm(options?: DurableObjectGetAlarmOptions): Promise<number | null>;
   setAlarm(
-    param1: number | Date,
-    param2?: DurableObjectSetAlarmOptions,
+    scheduledTime: number | Date,
+    options?: DurableObjectSetAlarmOptions,
   ): Promise<void>;
-  deleteAlarm(param1?: DurableObjectSetAlarmOptions): Promise<void>;
+  deleteAlarm(options?: DurableObjectSetAlarmOptions): Promise<void>;
 }
 interface DurableObjectStorage {
   get<T = unknown>(
@@ -593,12 +593,12 @@ interface DurableObjectStorage {
   transaction<T>(
     closure: (txn: DurableObjectTransaction) => Promise<T>,
   ): Promise<T>;
-  getAlarm(param1?: DurableObjectGetAlarmOptions): Promise<number | null>;
+  getAlarm(options?: DurableObjectGetAlarmOptions): Promise<number | null>;
   setAlarm(
-    param1: number | Date,
-    param2?: DurableObjectSetAlarmOptions,
+    scheduledTime: number | Date,
+    options?: DurableObjectSetAlarmOptions,
   ): Promise<void>;
-  deleteAlarm(param1?: DurableObjectSetAlarmOptions): Promise<void>;
+  deleteAlarm(options?: DurableObjectSetAlarmOptions): Promise<void>;
   sync(): Promise<void>;
   transactionSync<T>(closure: () => T): T;
 }

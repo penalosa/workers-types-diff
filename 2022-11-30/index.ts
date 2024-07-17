@@ -20,7 +20,7 @@ and limitations under the License.
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMException)
  */
 export declare class DOMException extends Error {
-  constructor(arg1?: string, arg2?: string);
+  constructor(message?: string, name?: string);
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMException/message) */
   readonly message: string;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMException/name) */
@@ -208,24 +208,24 @@ export interface ServiceWorkerGlobalScope extends WorkerGlobalScope {
   DOMException: typeof DOMException;
   WorkerGlobalScope: typeof WorkerGlobalScope;
   btoa(data: string): string;
-  atob(arg1: string): string;
+  atob(data: string): string;
   setTimeout(callback: (...args: any[]) => void, msDelay?: number): number;
   setTimeout<Args extends any[]>(
     callback: (...args: Args) => void,
     msDelay?: number,
     ...args: Args
   ): number;
-  clearTimeout(arg0: number | null): void;
+  clearTimeout(timeoutId: number | null): void;
   setInterval(callback: (...args: any[]) => void, msDelay?: number): number;
   setInterval<Args extends any[]>(
     callback: (...args: Args) => void,
     msDelay?: number,
     ...args: Args
   ): number;
-  clearInterval(arg0: number | null): void;
-  queueMicrotask(arg1: Function): void;
+  clearInterval(timeoutId: number | null): void;
+  queueMicrotask(task: Function): void;
   structuredClone<T>(value: T, options?: StructuredSerializeOptions): T;
-  reportError(arg1: any): void;
+  reportError(error: any): void;
   fetch(
     input: RequestInfo,
     init?: RequestInit<RequestInitCfProperties>,
@@ -328,7 +328,7 @@ export declare function dispatchEvent(
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/btoa) */
 export declare function btoa(data: string): string;
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/atob) */
-export declare function atob(arg1: string): string;
+export declare function atob(data: string): string;
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/setTimeout) */
 export declare function setTimeout(
   callback: (...args: any[]) => void,
@@ -341,7 +341,7 @@ export declare function setTimeout<Args extends any[]>(
   ...args: Args
 ): number;
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/clearTimeout) */
-export declare function clearTimeout(arg0: number | null): void;
+export declare function clearTimeout(timeoutId: number | null): void;
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/setInterval) */
 export declare function setInterval(
   callback: (...args: any[]) => void,
@@ -354,16 +354,16 @@ export declare function setInterval<Args extends any[]>(
   ...args: Args
 ): number;
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/clearInterval) */
-export declare function clearInterval(arg0: number | null): void;
+export declare function clearInterval(timeoutId: number | null): void;
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/queueMicrotask) */
-export declare function queueMicrotask(arg1: Function): void;
+export declare function queueMicrotask(task: Function): void;
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/structuredClone) */
 export declare function structuredClone<T>(
   value: T,
   options?: StructuredSerializeOptions,
 ): T;
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/reportError) */
-export declare function reportError(arg1: any): void;
+export declare function reportError(error: any): void;
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/fetch) */
 export declare function fetch(
   input: RequestInfo,
@@ -397,7 +397,7 @@ export declare const origin: string;
 export declare const navigator: Navigator;
 export interface TestController {}
 export interface ExecutionContext {
-  waitUntil(arg0: Promise<any>): void;
+  waitUntil(promise: Promise<any>): void;
   passThroughOnException(): void;
 }
 export type ExportedHandlerFetchHandler<
@@ -458,8 +458,8 @@ export declare abstract class PromiseRejectionEvent extends Event {
 }
 export declare abstract class Navigator {
   sendBeacon(
-    arg1: string,
-    arg2?:
+    url: string,
+    body?:
       | ReadableStream
       | string
       | (ArrayBuffer | ArrayBufferView)
@@ -512,15 +512,17 @@ export type DurableObjectStub<
 };
 export interface DurableObjectId {
   toString(): string;
-  equals(arg0: DurableObjectId): boolean;
+  equals(other: DurableObjectId): boolean;
   readonly name?: string;
 }
 export interface DurableObjectNamespace<
   T extends Rpc.DurableObjectBranded | undefined = undefined,
 > {
-  newUniqueId(arg0?: DurableObjectNamespaceNewUniqueIdOptions): DurableObjectId;
-  idFromName(arg0: string): DurableObjectId;
-  idFromString(arg0: string): DurableObjectId;
+  newUniqueId(
+    options?: DurableObjectNamespaceNewUniqueIdOptions,
+  ): DurableObjectId;
+  idFromName(name: string): DurableObjectId;
+  idFromString(id: string): DurableObjectId;
   get(
     id: DurableObjectId,
     options?: DurableObjectNamespaceGetDurableObjectOptions,
@@ -547,18 +549,18 @@ export interface DurableObjectNamespaceGetDurableObjectOptions {
   locationHint?: DurableObjectLocationHint;
 }
 export interface DurableObjectState {
-  waitUntil(arg0: Promise<any>): void;
+  waitUntil(promise: Promise<any>): void;
   readonly id: DurableObjectId;
   readonly storage: DurableObjectStorage;
   blockConcurrencyWhile<T>(callback: () => Promise<T>): Promise<T>;
-  acceptWebSocket(arg0: WebSocket, arg1?: string[]): void;
-  getWebSockets(arg1?: string): WebSocket[];
-  setWebSocketAutoResponse(arg0?: WebSocketRequestResponsePair): void;
+  acceptWebSocket(ws: WebSocket, tags?: string[]): void;
+  getWebSockets(tag?: string): WebSocket[];
+  setWebSocketAutoResponse(maybeReqResp?: WebSocketRequestResponsePair): void;
   getWebSocketAutoResponse(): WebSocketRequestResponsePair | null;
-  getWebSocketAutoResponseTimestamp(arg0: WebSocket): Date | null;
-  setHibernatableWebSocketEventTimeout(arg0?: number): void;
+  getWebSocketAutoResponseTimestamp(ws: WebSocket): Date | null;
+  setHibernatableWebSocketEventTimeout(timeoutMs?: number): void;
   getHibernatableWebSocketEventTimeout(): number | null;
-  getTags(arg1: WebSocket): string[];
+  getTags(ws: WebSocket): string[];
 }
 export interface DurableObjectTransaction {
   get<T = unknown>(
@@ -584,12 +586,12 @@ export interface DurableObjectTransaction {
   delete(key: string, options?: DurableObjectPutOptions): Promise<boolean>;
   delete(keys: string[], options?: DurableObjectPutOptions): Promise<number>;
   rollback(): void;
-  getAlarm(arg1?: DurableObjectGetAlarmOptions): Promise<number | null>;
+  getAlarm(param1?: DurableObjectGetAlarmOptions): Promise<number | null>;
   setAlarm(
-    arg1: number | Date,
-    arg2?: DurableObjectSetAlarmOptions,
+    param1: number | Date,
+    param2?: DurableObjectSetAlarmOptions,
   ): Promise<void>;
-  deleteAlarm(arg1?: DurableObjectSetAlarmOptions): Promise<void>;
+  deleteAlarm(param1?: DurableObjectSetAlarmOptions): Promise<void>;
 }
 export interface DurableObjectStorage {
   get<T = unknown>(
@@ -614,16 +616,16 @@ export interface DurableObjectStorage {
   ): Promise<void>;
   delete(key: string, options?: DurableObjectPutOptions): Promise<boolean>;
   delete(keys: string[], options?: DurableObjectPutOptions): Promise<number>;
-  deleteAll(arg1?: DurableObjectPutOptions): Promise<void>;
+  deleteAll(options?: DurableObjectPutOptions): Promise<void>;
   transaction<T>(
     closure: (txn: DurableObjectTransaction) => Promise<T>,
   ): Promise<T>;
-  getAlarm(arg1?: DurableObjectGetAlarmOptions): Promise<number | null>;
+  getAlarm(param1?: DurableObjectGetAlarmOptions): Promise<number | null>;
   setAlarm(
-    arg1: number | Date,
-    arg2?: DurableObjectSetAlarmOptions,
+    param1: number | Date,
+    param2?: DurableObjectSetAlarmOptions,
   ): Promise<void>;
-  deleteAlarm(arg1?: DurableObjectSetAlarmOptions): Promise<void>;
+  deleteAlarm(param1?: DurableObjectSetAlarmOptions): Promise<void>;
   sync(): Promise<void>;
   transactionSync<T>(closure: () => T): T;
 }
@@ -654,12 +656,12 @@ export interface DurableObjectSetAlarmOptions {
   allowUnconfirmed?: boolean;
 }
 export declare class WebSocketRequestResponsePair {
-  constructor(arg0: string, arg1: string);
+  constructor(request: string, response: string);
   get request(): string;
   get response(): string;
 }
 export interface AnalyticsEngineDataset {
-  writeDataPoint(arg1?: AnalyticsEngineDataPoint): void;
+  writeDataPoint(event?: AnalyticsEngineDataPoint): void;
 }
 export interface AnalyticsEngineDataPoint {
   indexes?: ((ArrayBuffer | string) | null)[];
@@ -672,7 +674,7 @@ export interface AnalyticsEngineDataPoint {
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event)
  */
 export declare class Event {
-  constructor(arg0: string, arg1?: EventInit);
+  constructor(type: string, init?: EventInit);
   /**
    * Returns the type of event, e.g. "click", "hashchange", or "submit".
    *
@@ -872,7 +874,7 @@ export declare class AbortController {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortController/abort)
    */
-  abort(arg1?: any): void;
+  abort(reason?: any): void;
 }
 /**
  * A signal object that allows you to communicate with a DOM request (such as a Fetch) and abort it if required via an AbortController object.
@@ -881,11 +883,11 @@ export declare class AbortController {
  */
 export declare abstract class AbortSignal extends EventTarget {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/abort_static) */
-  static abort(arg1?: any): AbortSignal;
+  static abort(reason?: any): AbortSignal;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/timeout_static) */
-  static timeout(arg1: number): AbortSignal;
+  static timeout(delay: number): AbortSignal;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/any_static) */
-  static any(arg1: AbortSignal[]): AbortSignal;
+  static any(signals: AbortSignal[]): AbortSignal;
   /**
    * Returns true if this AbortSignal's AbortController has signaled to abort, and false otherwise.
    *
@@ -902,7 +904,7 @@ export declare abstract class AbortSignal extends EventTarget {
   throwIfAborted(): void;
 }
 export interface Scheduler {
-  wait(arg1: number, arg2?: SchedulerWaitOptions): Promise<void>;
+  wait(delay: number, maybeOptions?: SchedulerWaitOptions): Promise<void>;
 }
 export interface SchedulerWaitOptions {
   signal?: AbortSignal;
@@ -914,11 +916,11 @@ export interface SchedulerWaitOptions {
  */
 export declare abstract class ExtendableEvent extends Event {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ExtendableEvent/waitUntil) */
-  waitUntil(arg0: Promise<any>): void;
+  waitUntil(promise: Promise<any>): void;
 }
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/CustomEvent) */
 export declare class CustomEvent<T = any> extends Event {
-  constructor(arg1: string, arg2?: CustomEventCustomEventInit);
+  constructor(type: string, init?: CustomEventCustomEventInit);
   /**
    * Returns any custom data event was created with. Typically used for synthetic events.
    *
@@ -939,15 +941,15 @@ export interface CustomEventCustomEventInit {
  */
 export declare class Blob {
   constructor(
-    arg1?: ((ArrayBuffer | ArrayBufferView) | string | Blob)[],
-    arg2?: BlobOptions,
+    type?: ((ArrayBuffer | ArrayBufferView) | string | Blob)[],
+    options?: BlobOptions,
   );
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/size) */
   get size(): number;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/type) */
   get type(): string;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/slice) */
-  slice(arg0?: number, arg1?: number, arg2?: string): Blob;
+  slice(start?: number, end?: number, type?: string): Blob;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/arrayBuffer) */
   arrayBuffer(): Promise<ArrayBuffer>;
   bytes(): Promise<Uint8Array>;
@@ -966,9 +968,9 @@ export interface BlobOptions {
  */
 export declare class File extends Blob {
   constructor(
-    arg1: ((ArrayBuffer | ArrayBufferView) | string | Blob)[] | undefined,
-    arg2: string,
-    arg3?: FileOptions,
+    bits: ((ArrayBuffer | ArrayBufferView) | string | Blob)[] | undefined,
+    name: string,
+    options?: FileOptions,
   );
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/File/name) */
   get name(): string;
@@ -986,7 +988,7 @@ export interface FileOptions {
  */
 export declare abstract class CacheStorage {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/CacheStorage/open) */
-  open(arg1: string): Promise<Cache>;
+  open(cacheName: string): Promise<Cache>;
   readonly default: Cache;
 }
 /**
@@ -1052,84 +1054,84 @@ export declare abstract class Crypto {
 export declare abstract class SubtleCrypto {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt) */
   encrypt(
-    arg1: string | SubtleCryptoEncryptAlgorithm,
-    arg2: CryptoKey,
-    arg3: ArrayBuffer | ArrayBufferView,
+    algorithm: string | SubtleCryptoEncryptAlgorithm,
+    key: CryptoKey,
+    plainText: ArrayBuffer | ArrayBufferView,
   ): Promise<ArrayBuffer>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt) */
   decrypt(
-    arg1: string | SubtleCryptoEncryptAlgorithm,
-    arg2: CryptoKey,
-    arg3: ArrayBuffer | ArrayBufferView,
+    algorithm: string | SubtleCryptoEncryptAlgorithm,
+    key: CryptoKey,
+    cipherText: ArrayBuffer | ArrayBufferView,
   ): Promise<ArrayBuffer>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign) */
   sign(
-    arg1: string | SubtleCryptoSignAlgorithm,
-    arg2: CryptoKey,
-    arg3: ArrayBuffer | ArrayBufferView,
+    algorithm: string | SubtleCryptoSignAlgorithm,
+    key: CryptoKey,
+    data: ArrayBuffer | ArrayBufferView,
   ): Promise<ArrayBuffer>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify) */
   verify(
-    arg1: string | SubtleCryptoSignAlgorithm,
-    arg2: CryptoKey,
-    arg3: ArrayBuffer | ArrayBufferView,
-    arg4: ArrayBuffer | ArrayBufferView,
+    algorithm: string | SubtleCryptoSignAlgorithm,
+    key: CryptoKey,
+    signature: ArrayBuffer | ArrayBufferView,
+    data: ArrayBuffer | ArrayBufferView,
   ): Promise<boolean>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest) */
   digest(
-    arg1: string | SubtleCryptoHashAlgorithm,
-    arg2: ArrayBuffer | ArrayBufferView,
+    algorithm: string | SubtleCryptoHashAlgorithm,
+    data: ArrayBuffer | ArrayBufferView,
   ): Promise<ArrayBuffer>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey) */
   generateKey(
-    arg1: string | SubtleCryptoGenerateKeyAlgorithm,
-    arg2: boolean,
-    arg3: string[],
+    algorithm: string | SubtleCryptoGenerateKeyAlgorithm,
+    extractable: boolean,
+    keyUsages: string[],
   ): Promise<CryptoKey | CryptoKeyPair>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey) */
   deriveKey(
-    arg1: string | SubtleCryptoDeriveKeyAlgorithm,
-    arg2: CryptoKey,
-    arg3: string | SubtleCryptoImportKeyAlgorithm,
-    arg4: boolean,
-    arg5: string[],
+    algorithm: string | SubtleCryptoDeriveKeyAlgorithm,
+    baseKey: CryptoKey,
+    derivedKeyAlgorithm: string | SubtleCryptoImportKeyAlgorithm,
+    extractable: boolean,
+    keyUsages: string[],
   ): Promise<CryptoKey>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits) */
   deriveBits(
-    arg1: string | SubtleCryptoDeriveKeyAlgorithm,
-    arg2: CryptoKey,
-    arg3?: number | null,
+    algorithm: string | SubtleCryptoDeriveKeyAlgorithm,
+    baseKey: CryptoKey,
+    length?: number | null,
   ): Promise<ArrayBuffer>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey) */
   importKey(
-    arg1: string,
-    arg2: (ArrayBuffer | ArrayBufferView) | JsonWebKey,
-    arg3: string | SubtleCryptoImportKeyAlgorithm,
-    arg4: boolean,
-    arg5: string[],
+    format: string,
+    keyData: (ArrayBuffer | ArrayBufferView) | JsonWebKey,
+    algorithm: string | SubtleCryptoImportKeyAlgorithm,
+    extractable: boolean,
+    keyUsages: string[],
   ): Promise<CryptoKey>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/exportKey) */
-  exportKey(arg1: string, arg2: CryptoKey): Promise<ArrayBuffer | JsonWebKey>;
+  exportKey(format: string, key: CryptoKey): Promise<ArrayBuffer | JsonWebKey>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/wrapKey) */
   wrapKey(
-    arg1: string,
-    arg2: CryptoKey,
-    arg3: CryptoKey,
-    arg4: string | SubtleCryptoEncryptAlgorithm,
+    format: string,
+    key: CryptoKey,
+    wrappingKey: CryptoKey,
+    wrapAlgorithm: string | SubtleCryptoEncryptAlgorithm,
   ): Promise<ArrayBuffer>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey) */
   unwrapKey(
-    arg1: string,
-    arg2: ArrayBuffer | ArrayBufferView,
-    arg3: CryptoKey,
-    arg4: string | SubtleCryptoEncryptAlgorithm,
-    arg5: string | SubtleCryptoImportKeyAlgorithm,
-    arg6: boolean,
-    arg7: string[],
+    format: string,
+    wrappedKey: ArrayBuffer | ArrayBufferView,
+    unwrappingKey: CryptoKey,
+    unwrapAlgorithm: string | SubtleCryptoEncryptAlgorithm,
+    unwrappedKeyAlgorithm: string | SubtleCryptoImportKeyAlgorithm,
+    extractable: boolean,
+    keyUsages: string[],
   ): Promise<CryptoKey>;
   timingSafeEqual(
-    arg0: ArrayBuffer | ArrayBufferView,
-    arg1: ArrayBuffer | ArrayBufferView,
+    a: ArrayBuffer | ArrayBufferView,
+    b: ArrayBuffer | ArrayBufferView,
   ): boolean;
 }
 /**
@@ -1255,7 +1257,7 @@ export interface CryptoKeyArbitraryKeyAlgorithm {
 export declare class DigestStream extends WritableStream<
   ArrayBuffer | ArrayBufferView
 > {
-  constructor(arg1: string | SubtleCryptoHashAlgorithm);
+  constructor(algorithm: string | SubtleCryptoHashAlgorithm);
   get digest(): Promise<ArrayBuffer>;
   get bytesWritten(): number | bigint;
 }
@@ -1265,7 +1267,7 @@ export declare class DigestStream extends WritableStream<
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder)
  */
 export declare class TextDecoder {
-  constructor(arg0?: string, arg1?: TextDecoderConstructorOptions);
+  constructor(decoder?: string, options?: TextDecoderConstructorOptions);
   /**
    * Returns the result of running encoding's decoder. The method can be invoked zero or more times with options's stream set to true, and then once without options's stream (or set to false), to process a fragmented input. If the invocation without options's stream (or set to false) has no input, it's clearest to omit both arguments.
    *
@@ -1282,8 +1284,8 @@ export declare class TextDecoder {
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)
    */
   decode(
-    arg1?: ArrayBuffer | ArrayBufferView,
-    arg2?: TextDecoderDecodeOptions,
+    input?: ArrayBuffer | ArrayBufferView,
+    options?: TextDecoderDecodeOptions,
   ): string;
   get encoding(): string;
   get fatal(): boolean;
@@ -1308,8 +1310,8 @@ export declare class TextEncoder {
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextEncoder/encodeInto)
    */
   encodeInto(
-    arg1: string,
-    arg2: ArrayBuffer | ArrayBufferView,
+    input: string,
+    buffer: ArrayBuffer | ArrayBufferView,
   ): TextEncoderEncodeIntoResult;
   get encoding(): string;
 }
@@ -1330,7 +1332,7 @@ export interface TextEncoderEncodeIntoResult {
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ErrorEvent)
  */
 export declare class ErrorEvent extends Event {
-  constructor(arg1: string, arg2?: ErrorEventErrorEventInit);
+  constructor(type: string, init?: ErrorEventErrorEventInit);
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ErrorEvent/filename) */
   get filename(): string;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ErrorEvent/message) */
@@ -1361,13 +1363,13 @@ export declare class FormData {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/append) */
   append(name: string, value: Blob, filename?: string): void;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/delete) */
-  delete(arg0: string): void;
+  delete(name: string): void;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/get) */
-  get(arg0: string): (File | string) | null;
+  get(name: string): (File | string) | null;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/getAll) */
-  getAll(arg0: string): (File | string)[];
+  getAll(name: string): (File | string)[];
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/has) */
-  has(arg0: string): boolean;
+  has(name: string): boolean;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/set) */
   set(name: string, value: string): void;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/set) */
@@ -1394,9 +1396,12 @@ export interface ContentOptions {
 }
 export declare class HTMLRewriter {
   constructor();
-  on(arg0: string, arg1: HTMLRewriterElementContentHandlers): HTMLRewriter;
-  onDocument(arg0: HTMLRewriterDocumentContentHandlers): HTMLRewriter;
-  transform(arg1: Response): Response;
+  on(
+    selector: string,
+    handlers: HTMLRewriterElementContentHandlers,
+  ): HTMLRewriter;
+  onDocument(handlers: HTMLRewriterDocumentContentHandlers): HTMLRewriter;
+  transform(response: Response): Response;
 }
 export interface HTMLRewriterElementContentHandlers {
   element?(element: Element): void | Promise<void>;
@@ -1419,10 +1424,10 @@ export interface Element {
   readonly attributes: IterableIterator<string[]>;
   readonly removed: boolean;
   readonly namespaceURI: string;
-  getAttribute(arg0: string): string | null;
-  hasAttribute(arg0: string): boolean;
-  setAttribute(arg0: string, arg1: string): Element;
-  removeAttribute(arg0: string): Element;
+  getAttribute(name: string): string | null;
+  hasAttribute(name: string): boolean;
+  setAttribute(name: string, value: string): Element;
+  removeAttribute(name: string): Element;
   before(content: string, options?: ContentOptions): Element;
   after(content: string, options?: ContentOptions): Element;
   prepend(content: string, options?: ContentOptions): Element;
@@ -1468,7 +1473,7 @@ export declare abstract class FetchEvent extends ExtendableEvent {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/FetchEvent/request) */
   readonly request: Request;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/FetchEvent/respondWith) */
-  respondWith(arg1: Response | Promise<Response>): void;
+  respondWith(promise: Response | Promise<Response>): void;
   passThroughOnException(): void;
 }
 export type HeadersInit =
@@ -1483,16 +1488,16 @@ export type HeadersInit =
 export declare class Headers {
   constructor(init?: HeadersInit);
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/get) */
-  get(arg0: string): string | null;
-  getAll(arg0: string): string[];
+  get(name: string): string | null;
+  getAll(name: string): string[];
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/has) */
-  has(arg0: string): boolean;
+  has(name: string): boolean;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/set) */
-  set(arg0: string, arg1: string): void;
+  set(name: string, value: string): void;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/append) */
-  append(arg0: string, arg1: string): void;
+  append(name: string, value: string): void;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/delete) */
-  delete(arg0: string): void;
+  delete(name: string): void;
   forEach<This = unknown>(
     callback: (this: This, value: string, key: string, parent: Headers) => void,
     thisArg?: This,
@@ -1538,9 +1543,9 @@ export declare abstract class Body {
 export declare class Response extends Body {
   constructor(body?: BodyInit | null, init?: ResponseInit);
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/redirect_static) */
-  static redirect(arg1: string, arg2?: number): Response;
+  static redirect(url: string, status?: number): Response;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/json_static) */
-  static json(arg1: any, arg2?: ResponseInit | Response): Response;
+  static json(any: any, maybeInit?: ResponseInit | Response): Response;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/clone) */
   clone(): Response;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/status) */
@@ -1797,19 +1802,19 @@ export interface Message<Body = unknown> {
   readonly timestamp: Date;
   readonly body: Body;
   readonly attempts: number;
-  retry(arg0?: QueueRetryOptions): void;
+  retry(options?: QueueRetryOptions): void;
   ack(): void;
 }
 export interface QueueEvent<Body = unknown> extends ExtendableEvent {
   readonly messages: readonly Message<Body>[];
   readonly queue: string;
-  retryAll(arg0?: QueueRetryOptions): void;
+  retryAll(options?: QueueRetryOptions): void;
   ackAll(): void;
 }
 export interface MessageBatch<Body = unknown> {
   readonly messages: readonly Message<Body>[];
   readonly queue: string;
-  retryAll(arg0?: QueueRetryOptions): void;
+  retryAll(options?: QueueRetryOptions): void;
   ackAll(): void;
 }
 export interface R2Error extends Error {
@@ -1828,7 +1833,7 @@ export interface R2ListOptions {
   include?: ("httpMetadata" | "customMetadata")[];
 }
 export declare abstract class R2Bucket {
-  head(arg1: string): Promise<R2Object | null>;
+  head(key: string): Promise<R2Object | null>;
   get(
     key: string,
     options: R2GetOptions & {
@@ -1861,22 +1866,22 @@ export declare abstract class R2Bucket {
     options?: R2PutOptions,
   ): Promise<R2Object>;
   createMultipartUpload(
-    arg1: string,
-    arg2?: R2MultipartOptions,
+    key: string,
+    options?: R2MultipartOptions,
   ): Promise<R2MultipartUpload>;
-  resumeMultipartUpload(arg1: string, arg2: string): R2MultipartUpload;
-  delete(arg1: string | string[]): Promise<void>;
-  list(arg1?: R2ListOptions): Promise<R2Objects>;
+  resumeMultipartUpload(key: string, uploadId: string): R2MultipartUpload;
+  delete(keys: string | string[]): Promise<void>;
+  list(options?: R2ListOptions): Promise<R2Objects>;
 }
 export interface R2MultipartUpload {
   readonly key: string;
   readonly uploadId: string;
   uploadPart(
-    arg1: number,
-    arg2: ReadableStream | (ArrayBuffer | ArrayBufferView) | string | Blob,
+    partNumber: number,
+    value: ReadableStream | (ArrayBuffer | ArrayBufferView) | string | Blob,
   ): Promise<R2UploadedPart>;
   abort(): Promise<void>;
-  complete(arg1: R2UploadedPart[]): Promise<R2Object>;
+  complete(uploadedParts: R2UploadedPart[]): Promise<R2Object>;
 }
 export interface R2UploadedPart {
   partNumber: number;
@@ -1894,7 +1899,7 @@ export declare abstract class R2Object {
   readonly customMetadata?: Record<string, string>;
   readonly range?: R2Range;
   readonly storageClass: string;
-  writeHttpMetadata(arg1: Headers): void;
+  writeHttpMetadata(headers: Headers): void;
 }
 export interface R2ObjectBody extends R2Object {
   get body(): ReadableStream;
@@ -2117,9 +2122,9 @@ export declare const ReadableStream: {
 };
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultReader) */
 export declare class ReadableStreamDefaultReader<R = any> {
-  constructor(arg1: ReadableStream);
+  constructor(stream: ReadableStream);
   get closed(): Promise<void>;
-  cancel(arg1?: any): Promise<void>;
+  cancel(reason?: any): Promise<void>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultReader/read) */
   read(): Promise<ReadableStreamReadResult<R>>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultReader/releaseLock) */
@@ -2127,9 +2132,9 @@ export declare class ReadableStreamDefaultReader<R = any> {
 }
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader) */
 export declare class ReadableStreamBYOBReader {
-  constructor(arg1: ReadableStream);
+  constructor(stream: ReadableStream);
   get closed(): Promise<void>;
-  cancel(arg1?: any): Promise<void>;
+  cancel(reason?: any): Promise<void>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader/read) */
   read<T extends ArrayBufferView>(
     view: T,
@@ -2157,9 +2162,9 @@ export declare abstract class ReadableStreamBYOBRequest {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest/view) */
   get view(): Uint8Array | null;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest/respond) */
-  respond(arg1: number): void;
+  respond(bytesWritten: number): void;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest/respondWithNewView) */
-  respondWithNewView(arg1: ArrayBuffer | ArrayBufferView): void;
+  respondWithNewView(view: ArrayBuffer | ArrayBufferView): void;
   get atLeast(): number | null;
 }
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController) */
@@ -2171,7 +2176,7 @@ export declare abstract class ReadableStreamDefaultController<R = any> {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/enqueue) */
   enqueue(chunk?: R): void;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/error) */
-  error(arg1: any): void;
+  error(reason: any): void;
 }
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController) */
 export declare abstract class ReadableByteStreamController {
@@ -2182,9 +2187,9 @@ export declare abstract class ReadableByteStreamController {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/close) */
   close(): void;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/enqueue) */
-  enqueue(arg1: ArrayBuffer | ArrayBufferView): void;
+  enqueue(chunk: ArrayBuffer | ArrayBufferView): void;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/error) */
-  error(arg1: any): void;
+  error(reason: any): void;
 }
 /**
  * This Streams API interface represents a controller allowing control of a WritableStream's state. When constructing a WritableStream, the underlying sink is given a corresponding WritableStreamDefaultController instance to manipulate.
@@ -2195,7 +2200,7 @@ export declare abstract class WritableStreamDefaultController {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultController/signal) */
   get signal(): AbortSignal;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultController/error) */
-  error(arg1?: any): void;
+  error(reason?: any): void;
 }
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController) */
 export declare abstract class TransformStreamDefaultController<O = any> {
@@ -2204,7 +2209,7 @@ export declare abstract class TransformStreamDefaultController<O = any> {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/enqueue) */
   enqueue(chunk?: O): void;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/error) */
-  error(arg1: any): void;
+  error(reason: any): void;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/terminate) */
   terminate(): void;
 }
@@ -2223,11 +2228,14 @@ export interface ReadableWritablePair<R = any, W = any> {
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream)
  */
 export declare class WritableStream<W = any> {
-  constructor(arg1?: UnderlyingSink, arg2?: QueuingStrategy);
+  constructor(
+    underlyingSink?: UnderlyingSink,
+    queuingStrategy?: QueuingStrategy,
+  );
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/locked) */
   get locked(): boolean;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/abort) */
-  abort(arg1?: any): Promise<void>;
+  abort(reason?: any): Promise<void>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/close) */
   close(): Promise<void>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/getWriter) */
@@ -2239,7 +2247,7 @@ export declare class WritableStream<W = any> {
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter)
  */
 export declare class WritableStreamDefaultWriter<W = any> {
-  constructor(arg1: WritableStream);
+  constructor(stream: WritableStream);
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/closed) */
   get closed(): Promise<void>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/ready) */
@@ -2247,7 +2255,7 @@ export declare class WritableStreamDefaultWriter<W = any> {
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/desiredSize) */
   get desiredSize(): number | null;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/abort) */
-  abort(arg1?: any): Promise<void>;
+  abort(reason?: any): Promise<void>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/close) */
   close(): Promise<void>;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/write) */
@@ -2269,15 +2277,15 @@ export declare class TransformStream<I = any, O = any> {
 }
 export declare class FixedLengthStream extends IdentityTransformStream {
   constructor(
-    arg1: number | bigint,
-    arg2?: IdentityTransformStreamQueuingStrategy,
+    expectedLength: number | bigint,
+    queuingStrategy?: IdentityTransformStreamQueuingStrategy,
   );
 }
 export declare class IdentityTransformStream extends TransformStream<
   ArrayBuffer | ArrayBufferView,
   Uint8Array
 > {
-  constructor(arg1?: IdentityTransformStreamQueuingStrategy);
+  constructor(queuingStrategy?: IdentityTransformStreamQueuingStrategy);
 }
 export interface IdentityTransformStreamQueuingStrategy {
   highWaterMark?: number | bigint;
@@ -2312,7 +2320,7 @@ export declare class TextDecoderStream extends TransformStream<
   ArrayBuffer | ArrayBufferView,
   string
 > {
-  constructor(arg1?: string, arg2?: TextDecoderStreamTextDecoderStreamInit);
+  constructor(label?: string, options?: TextDecoderStreamTextDecoderStreamInit);
   get encoding(): string;
   get fatal(): boolean;
   get ignoreBOM(): boolean;
@@ -2329,7 +2337,7 @@ export interface TextDecoderStreamTextDecoderStreamInit {
 export declare class ByteLengthQueuingStrategy
   implements QueuingStrategy<ArrayBufferView>
 {
-  constructor(arg0: QueuingStrategyInit);
+  constructor(init: QueuingStrategyInit);
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ByteLengthQueuingStrategy/highWaterMark) */
   get highWaterMark(): number;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ByteLengthQueuingStrategy/size) */
@@ -2341,7 +2349,7 @@ export declare class ByteLengthQueuingStrategy
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CountQueuingStrategy)
  */
 export declare class CountQueuingStrategy implements QueuingStrategy {
-  constructor(arg0: QueuingStrategyInit);
+  constructor(init: QueuingStrategyInit);
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/CountQueuingStrategy/highWaterMark) */
   get highWaterMark(): number;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/CountQueuingStrategy/size) */
@@ -2467,7 +2475,7 @@ export interface TraceMetrics {
   readonly wallTime: number;
 }
 export interface UnsafeTraceMetrics {
-  fromTrace(arg0: TraceItem): TraceMetrics;
+  fromTrace(item: TraceItem): TraceMetrics;
 }
 /**
  * The URL interface represents an object providing static methods used for creating object URLs.
@@ -2525,13 +2533,13 @@ export declare class URL {
   /*function toString() { [native code] }*/
   toString(): string;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/canParse_static) */
-  static canParse(arg0: string, arg1?: string): boolean;
-  static parse(arg1: string, arg2?: string): URL | null;
+  static canParse(url: string, base?: string): boolean;
+  static parse(url: string, base?: string): URL | null;
 }
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams) */
 export declare class URLSearchParams {
   constructor(
-    arg0?: Iterable<Iterable<string>> | Record<string, string> | string,
+    init?: Iterable<Iterable<string>> | Record<string, string> | string,
   );
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/size) */
   get size(): number;
@@ -2540,7 +2548,7 @@ export declare class URLSearchParams {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/append)
    */
-  append(arg0: string, arg1: string): void;
+  append(name: string, value: string): void;
   /**
    * Deletes the given search parameter, and its associated value, from the list of all search parameters.
    *
@@ -2552,13 +2560,13 @@ export declare class URLSearchParams {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/get)
    */
-  get(arg0: string): string | null;
+  get(name: string): string | null;
   /**
    * Returns all the values association with a given search parameter.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/getAll)
    */
-  getAll(arg0: string): string[];
+  getAll(name: string): string[];
   /**
    * Returns a Boolean indicating if such a search parameter exists.
    *
@@ -2570,7 +2578,7 @@ export declare class URLSearchParams {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/set)
    */
-  set(arg0: string, arg1: string): void;
+  set(name: string, value: string): void;
   /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/sort) */
   sort(): void;
   /* Returns an array of key, value pairs for every entry in the search params. */
@@ -2594,9 +2602,9 @@ export declare class URLSearchParams {
 }
 export declare class URLPattern {
   constructor(
-    arg1?: string | URLPatternURLPatternInit,
-    arg2?: string,
-    arg3?: URLPatternURLPatternOptions,
+    input?: string | URLPatternURLPatternInit,
+    baseURL?: string,
+    patternOptions?: URLPatternURLPatternOptions,
   );
   get protocol(): string;
   get username(): string;
@@ -2606,10 +2614,10 @@ export declare class URLPattern {
   get pathname(): string;
   get search(): string;
   get hash(): string;
-  test(arg1?: string | URLPatternURLPatternInit, arg2?: string): boolean;
+  test(input?: string | URLPatternURLPatternInit, baseURL?: string): boolean;
   exec(
-    arg1?: string | URLPatternURLPatternInit,
-    arg2?: string,
+    input?: string | URLPatternURLPatternInit,
+    baseURL?: string,
   ): URLPatternURLPatternResult | null;
 }
 export interface URLPatternURLPatternInit {
@@ -2647,7 +2655,7 @@ export interface URLPatternURLPatternOptions {
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CloseEvent)
  */
 export declare class CloseEvent extends Event {
-  constructor(arg0: string, arg1?: CloseEventInit);
+  constructor(type: string, initializer?: CloseEventInit);
   /**
    * Returns the WebSocket connection close code provided by the server.
    *
@@ -2678,7 +2686,7 @@ export interface CloseEventInit {
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessageEvent)
  */
 export declare class MessageEvent extends Event {
-  constructor(arg1: string, arg2: MessageEventInit);
+  constructor(type: string, initializer: MessageEventInit);
   /**
    * Returns the data of the message.
    *
@@ -2701,21 +2709,21 @@ export type WebSocketEventMap = {
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket)
  */
 export declare class WebSocket extends EventTarget<WebSocketEventMap> {
-  constructor(arg1: string, arg2?: string[] | string);
+  constructor(url: string, protocols?: string[] | string);
   accept(): void;
   /**
    * Transmits data using the WebSocket connection. data can be a string, a Blob, an ArrayBuffer, or an ArrayBufferView.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/send)
    */
-  send(arg1: (ArrayBuffer | ArrayBufferView) | string): void;
+  send(message: (ArrayBuffer | ArrayBufferView) | string): void;
   /**
    * Closes the WebSocket connection, optionally using code as the the WebSocket connection close code and reason as the the WebSocket connection close reason.
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/close)
    */
-  close(arg1?: number, arg2?: string): void;
-  serializeAttachment(arg1: any): void;
+  close(code?: number, reason?: string): void;
+  serializeAttachment(attachment: any): void;
   deserializeAttachment(): any | null;
   static readonly READY_STATE_CONNECTING: number;
   static readonly CONNECTING: number;
@@ -2762,7 +2770,7 @@ export interface Socket {
   get closed(): Promise<void>;
   get opened(): Promise<SocketInfo>;
   close(): Promise<void>;
-  startTls(arg1?: TlsOptions): Socket;
+  startTls(options?: TlsOptions): Socket;
 }
 export interface SocketOptions {
   secureTransport?: string;
@@ -2781,28 +2789,38 @@ export interface SocketInfo {
   localAddress?: string;
 }
 export interface GPU {
-  requestAdapter(arg1?: GPURequestAdapterOptions): Promise<GPUAdapter | null>;
+  requestAdapter(param1?: GPURequestAdapterOptions): Promise<GPUAdapter | null>;
 }
 export declare abstract class GPUAdapter {
-  requestDevice(arg1?: GPUDeviceDescriptor): Promise<GPUDevice>;
-  requestAdapterInfo(arg1?: string[]): Promise<GPUAdapterInfo>;
+  requestDevice(param1?: GPUDeviceDescriptor): Promise<GPUDevice>;
+  requestAdapterInfo(unmaskHints?: string[]): Promise<GPUAdapterInfo>;
   get features(): GPUSupportedFeatures;
   get limits(): GPUSupportedLimits;
 }
 export interface GPUDevice extends EventTarget {
-  createBuffer(arg1: GPUBufferDescriptor): GPUBuffer;
-  createBindGroupLayout(arg0: GPUBindGroupLayoutDescriptor): GPUBindGroupLayout;
-  createBindGroup(arg0: GPUBindGroupDescriptor): GPUBindGroup;
-  createSampler(arg0: GPUSamplerDescriptor): GPUSampler;
-  createShaderModule(arg0: GPUShaderModuleDescriptor): GPUShaderModule;
-  createPipelineLayout(arg0: GPUPipelineLayoutDescriptor): GPUPipelineLayout;
-  createComputePipeline(arg0: GPUComputePipelineDescriptor): GPUComputePipeline;
-  createRenderPipeline(arg0: GPURenderPipelineDescriptor): GPURenderPipeline;
-  createCommandEncoder(arg0?: GPUCommandEncoderDescriptor): GPUCommandEncoder;
-  createTexture(arg1: GPUTextureDescriptor): GPUTexture;
+  createBuffer(param1: GPUBufferDescriptor): GPUBuffer;
+  createBindGroupLayout(
+    descriptor: GPUBindGroupLayoutDescriptor,
+  ): GPUBindGroupLayout;
+  createBindGroup(descriptor: GPUBindGroupDescriptor): GPUBindGroup;
+  createSampler(descriptor: GPUSamplerDescriptor): GPUSampler;
+  createShaderModule(descriptor: GPUShaderModuleDescriptor): GPUShaderModule;
+  createPipelineLayout(
+    descriptor: GPUPipelineLayoutDescriptor,
+  ): GPUPipelineLayout;
+  createComputePipeline(
+    descriptor: GPUComputePipelineDescriptor,
+  ): GPUComputePipeline;
+  createRenderPipeline(
+    descriptor: GPURenderPipelineDescriptor,
+  ): GPURenderPipeline;
+  createCommandEncoder(
+    descriptor?: GPUCommandEncoderDescriptor,
+  ): GPUCommandEncoder;
+  createTexture(param1: GPUTextureDescriptor): GPUTexture;
   destroy(): void;
-  createQuerySet(arg0: GPUQuerySetDescriptor): GPUQuerySet;
-  pushErrorScope(arg0: string): void;
+  createQuerySet(descriptor: GPUQuerySetDescriptor): GPUQuerySet;
+  pushErrorScope(filter: string): void;
   popErrorScope(): Promise<GPUError | null>;
   get queue(): GPUQueue;
   get lost(): Promise<GPUDeviceLostInfo>;
@@ -2837,13 +2855,13 @@ export declare abstract class GPUBufferUsage {
   static readonly QUERY_RESOLVE: number;
 }
 export interface GPUBuffer {
-  getMappedRange(arg1?: number | bigint, arg2?: number | bigint): ArrayBuffer;
+  getMappedRange(size?: number | bigint, param2?: number | bigint): ArrayBuffer;
   unmap(): void;
   destroy(): void;
   mapAsync(
-    arg1: number,
-    arg2?: number | bigint,
-    arg3?: number | bigint,
+    offset: number,
+    size?: number | bigint,
+    param3?: number | bigint,
   ): Promise<void>;
   get size(): number | bigint;
   get usage(): number;
@@ -2927,7 +2945,7 @@ export interface GPUPipelineLayoutDescriptor {
   bindGroupLayouts: GPUBindGroupLayout[];
 }
 export interface GPUComputePipeline {
-  getBindGroupLayout(arg0: number): GPUBindGroupLayout;
+  getBindGroupLayout(index: number): GPUBindGroupLayout;
 }
 export interface GPUComputePipelineDescriptor {
   label?: string;
@@ -2941,48 +2959,54 @@ export interface GPUProgrammableStage {
 }
 export interface GPUCommandEncoder {
   get label(): string;
-  beginComputePass(arg0?: GPUComputePassDescriptor): GPUComputePassEncoder;
-  beginRenderPass(arg0: GPURenderPassDescriptor): GPURenderPassEncoder;
+  beginComputePass(
+    descriptor?: GPUComputePassDescriptor,
+  ): GPUComputePassEncoder;
+  beginRenderPass(descriptor: GPURenderPassDescriptor): GPURenderPassEncoder;
   copyBufferToBuffer(
-    arg0: GPUBuffer,
-    arg1: number | bigint,
-    arg2: GPUBuffer,
-    arg3: number | bigint,
-    arg4: number | bigint,
+    source: GPUBuffer,
+    sourceOffset: number | bigint,
+    destination: GPUBuffer,
+    destinationOffset: number | bigint,
+    size: number | bigint,
   ): void;
-  finish(arg0?: GPUCommandBufferDescriptor): GPUCommandBuffer;
+  finish(param0?: GPUCommandBufferDescriptor): GPUCommandBuffer;
   copyTextureToBuffer(
-    arg0: GPUImageCopyTexture,
-    arg1: GPUImageCopyBuffer,
-    arg2: Iterable<number> | GPUExtent3DDict,
+    source: GPUImageCopyTexture,
+    destination: GPUImageCopyBuffer,
+    copySize: Iterable<number> | GPUExtent3DDict,
   ): void;
   copyBufferToTexture(
-    arg0: GPUImageCopyBuffer,
-    arg1: GPUImageCopyTexture,
-    arg2: Iterable<number> | GPUExtent3DDict,
+    source: GPUImageCopyBuffer,
+    destination: GPUImageCopyTexture,
+    copySize: Iterable<number> | GPUExtent3DDict,
   ): void;
   copyTextureToTexture(
-    arg0: GPUImageCopyTexture,
-    arg1: GPUImageCopyTexture,
-    arg2: Iterable<number> | GPUExtent3DDict,
+    source: GPUImageCopyTexture,
+    destination: GPUImageCopyTexture,
+    copySize: Iterable<number> | GPUExtent3DDict,
   ): void;
   clearBuffer(
-    arg0: GPUBuffer,
-    arg1?: number | bigint,
-    arg2?: number | bigint,
+    buffer: GPUBuffer,
+    offset?: number | bigint,
+    size?: number | bigint,
   ): void;
 }
 export interface GPUCommandEncoderDescriptor {
   label?: string;
 }
 export interface GPUComputePassEncoder {
-  setPipeline(arg0: GPUComputePipeline): void;
+  setPipeline(pipeline: GPUComputePipeline): void;
   setBindGroup(
-    arg0: number,
-    arg1: GPUBindGroup | null,
-    arg2?: Iterable<number>,
+    index: number,
+    bindGroup: GPUBindGroup | null,
+    dynamicOffsets?: Iterable<number>,
   ): void;
-  dispatchWorkgroups(arg0: number, arg1?: number, arg2?: number): void;
+  dispatchWorkgroups(
+    workgroupCountX: number,
+    workgroupCountY?: number,
+    workgroupCountZ?: number,
+  ): void;
   end(): void;
 }
 export interface GPUComputePassDescriptor {
@@ -3003,13 +3027,13 @@ export interface GPUCommandBufferDescriptor {
 }
 export interface GPUCommandBuffer {}
 export interface GPUQueue {
-  submit(arg0: GPUCommandBuffer[]): void;
+  submit(commandBuffers: GPUCommandBuffer[]): void;
   writeBuffer(
-    arg0: GPUBuffer,
-    arg1: number | bigint,
-    arg2: ArrayBuffer | ArrayBufferView,
-    arg3?: number | bigint,
-    arg4?: number | bigint,
+    buffer: GPUBuffer,
+    bufferOffset: number | bigint,
+    data: ArrayBuffer | ArrayBufferView,
+    dataOffset?: number | bigint,
+    size?: number | bigint,
   ): void;
 }
 export declare abstract class GPUMapMode {
@@ -3027,7 +3051,7 @@ export interface GPUAdapterInfo {
   get description(): string;
 }
 export interface GPUSupportedFeatures {
-  has(arg0: string): boolean;
+  has(name: string): boolean;
   keys(): string[];
 }
 export interface GPUSupportedLimits {
@@ -3107,7 +3131,7 @@ export interface GPUExtent3DDict {
   depthOrArrayLayers?: number;
 }
 export interface GPUTexture {
-  createView(arg0?: GPUTextureViewDescriptor): GPUTextureView;
+  createView(descriptor?: GPUTextureViewDescriptor): GPUTextureView;
   destroy(): void;
   get width(): number;
   get height(): number;
@@ -3212,8 +3236,13 @@ export interface GPUBlendComponent {
   dstFactor?: string;
 }
 export interface GPURenderPassEncoder {
-  setPipeline(arg0: GPURenderPipeline): void;
-  draw(arg0: number, arg1?: number, arg2?: number, arg3?: number): void;
+  setPipeline(pipeline: GPURenderPipeline): void;
+  draw(
+    vertexCount: number,
+    instanceCount?: number,
+    firstVertex?: number,
+    firstInstance?: number,
+  ): void;
   end(): void;
 }
 export interface GPURenderPassDescriptor {
@@ -3273,7 +3302,7 @@ export interface GPUOrigin3DDict {
 }
 /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventSource) */
 export declare class EventSource {
-  constructor(arg1: string, arg2?: EventSourceEventSourceInit);
+  constructor(url: string, init?: EventSourceEventSourceInit);
   /**
    * Aborts any instances of the fetch algorithm started for this EventSource object, and sets the readyState attribute to CLOSED.
    *
@@ -3313,7 +3342,7 @@ export declare class EventSource {
   static readonly CONNECTING: number;
   static readonly OPEN: number;
   static readonly CLOSED: number;
-  static from(arg1: ReadableStream): EventSource;
+  static from(stream: ReadableStream): EventSource;
 }
 export interface EventSourceEventSourceInit {
   withCredentials?: boolean;
